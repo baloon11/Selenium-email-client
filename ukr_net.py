@@ -19,6 +19,10 @@ class EmailService(object):
         elem=self.driver.find_element_by_css_selector(element_selector)
         elem.send_keys(text)
 
+    def _send_keys_element_by_name(self,element_selector='',text=''):
+        elem=self.driver.find_element_by_name(element_selector)
+        elem.send_keys(text)
+
     def _press_submit(self,element_selector=''):
         elem=self.driver.find_element_by_css_selector(element_selector)
         elem.submit()
@@ -48,18 +52,23 @@ class UkrNetService(EmailService):
         pas=unicode(raw_input('enter your pass: '))
 
         self.driver.get(email_service)
-        login =self.driver.find_element_by_css_selector('div.login input')
-        login.send_keys(log)
+        # login =self.driver.find_element_by_css_selector('div.login input')
+        # login.send_keys(log)
+        self._send_keys_element(element_selector='div.login input',text=log)#enter login
 
-        password=self.driver.find_element_by_css_selector('div.password input')
-        password.send_keys(pas)
+        # password=self.driver.find_element_by_css_selector('div.password input')
+        # password.send_keys(pas)
+        self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
 
-        submit_butt=self.driver.find_element_by_css_selector('div.submit button')
-        submit_butt.submit()
+        # submit_butt=self.driver.find_element_by_css_selector('div.submit button')
+        # submit_butt.submit()
+        self._press_submit(element_selector='div.submit button')
 
         self.driver.implicitly_wait(10)
-        letters=self.driver.find_element_by_css_selector('ul.user-info li a.mails')
-        letters.click()
+
+        # letters=self.driver.find_element_by_css_selector('ul.user-info li a.mails')
+        # letters.click()
+        self._click_by_element(element_selector='ul.user-info li a.mails')#transition to the page with a list of letters
 
     def _switch_to_simpletext_mode(self):
         simple_text_butt=self.driver.find_element_by_css_selector('div.fmedit-panel a')
@@ -70,32 +79,44 @@ class UkrNetService(EmailService):
             Alert(self.driver).accept()
 
     def write_letter(self):
-        to_email=raw_input('enter the email of the recipient: ')
-        subject=unicode(raw_input('enter the subject of the email: '))
-        text=unicode(raw_input('enter your the text of the email: '))
+        try:
+            to_email=raw_input('enter the email of the recipient: ')
+            subject=unicode(raw_input('enter the subject of the email: '))
+            text=unicode(raw_input('enter your the text of the email: '))
 
-        #letter_list_window=driver.window_handles[1]
-        self.driver.switch_to_window(self.driver.window_handles[1])
+            #letter_list_window=driver.window_handles[1]
+            self.driver.switch_to_window(self.driver.window_handles[1])
 
-        write_letter_butt=self.driver.find_element_by_css_selector('div.compose-link-box a.compose-message-link')
-        write_letter_butt.click()
-        self._switch_to_simpletext_mode()
+            # write_letter_butt=self.driver.find_element_by_css_selector('div.compose-link-box a.compose-message-link')
+            # write_letter_butt.click()
+            self._click_by_element(element_selector='div.compose-link-box a.compose-message-link')#write_letter_button click
 
-        self.driver.implicitly_wait(5)
+            self._switch_to_simpletext_mode()
 
-        to_field=self.driver.find_element_by_css_selector('input#toField')
-        to_field.send_keys(to_email)
+            self.driver.implicitly_wait(5)
 
-        subject_field=self.driver.find_element_by_name('subject')
-        subject_field.send_keys(subject)
+            # to_field=self.driver.find_element_by_css_selector('input#toField')
+            # to_field.send_keys(to_email)
+            self._send_keys_element(element_selector='input#toField',text=to_email)# enter to_field (an email)
 
-        letter_text=self.driver.find_element_by_css_selector('textarea#text')
-        letter_text.send_keys(text.decode())
+            # subject_field=self.driver.find_element_by_name('subject')
+            # subject_field.send_keys(subject)
+            self._send_keys_element_by_name(element_selector='subject',text=subject) #enter the subject of the email
 
-        send_letter_butt=self.driver.find_element_by_css_selector('span.send-button.button input')
-        send_letter_butt.click()
-        print "The letter was sent"
-        self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+            # letter_text=self.driver.find_element_by_css_selector('textarea#text')
+            # letter_text.send_keys(text)
+            self._send_keys_element(element_selector='textarea#text',text=text) #enter the text of the email
+
+            # send_letter_butt=self.driver.find_element_by_css_selector('span.send-button.button input')
+            # send_letter_butt.click()
+            self._click_by_element(element_selector='span.send-button.button input')# send an email
+
+            print "The letter was sent"
+            print '---'*8
+            self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+        except:
+            print "Error.The letter was not sent"
+            print '---'*8
 
     def letter_list(self):
         num=int(raw_input("enter how many recent emails' subjects you want to see: "))
@@ -103,7 +124,7 @@ class UkrNetService(EmailService):
         self.driver.switch_to_window(letter_list_window)
 
         tbody=self.driver.find_element_by_css_selector('table.grid.search-enabled tbody#msglist_rows')
-        rows_list=tbody.find_elements_by_css_selector('tr')[:num]# splice of thr list of rows
+        rows_list=tbody.find_elements_by_css_selector('tr')[:num]# the part of the list of rows
         for index,row in enumerate(rows_list, start=1):
             out_line=[]
             cols_list=row.find_elements_by_css_selector('td')# list of cols in current row
@@ -115,16 +136,16 @@ class UkrNetService(EmailService):
             #print subject
             date=unicode(cols_list[4].get_attribute("title"))
             #print date
-            print '%s| %s\t%s\t%s'%(index,from_title,subject,date)
+            print '%s | %s\t%s\t%s'%(index,from_title,subject,date)
             print '---'*8
         self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
 
 
 #uncomment this lines (if you want to see a list of subjects(table)) and run python ukr_net.py
-# ukr_net=UkrNetService()
-# ukr_net.open_email()# open https://www.ukr.net/ service, open list of letters
-# ukr_net.letter_list()#parsing list of subjects(table) and getting subjects and additional info
-# ukr_net.driver.quit()#close all windows
+ukr_net=UkrNetService()
+ukr_net.open_email()# open https://www.ukr.net/ service, open list of letters
+ukr_net.letter_list()#parsing list of subjects(table) and getting subjects and additional info
+ukr_net.driver.quit()#close all windows
 
 #uncomment this lines (if you want to send email) and run python ukr_net.py
 # ukr_net=UkrNetService()
