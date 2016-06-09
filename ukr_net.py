@@ -129,7 +129,7 @@ class UkrNetService(EmailService):
 # ukr_net.read_letter()
 # ukr_net.driver.quit()#close all windows
 
-#uncomment this lines (if you want to read email) and run python ukr_net.py
+#uncomment this lines (if you want to write email) and run python ukr_net.py
 # ukr_net=UkrNetService()
 # ukr_net.open_email()
 # ukr_net.write_letter()
