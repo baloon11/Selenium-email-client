@@ -50,7 +50,6 @@ class UkrNetService(EmailService):
         email_service='https://www.ukr.net/'
         log=unicode(raw_input('enter your login: '))
         pas=unicode(raw_input('enter your pass: '))
-
         self.driver.get(email_service)
         self._send_keys_element(element_selector='div.login input',text=log)#enter login
         self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
@@ -71,7 +70,7 @@ class UkrNetService(EmailService):
             to_email=raw_input('enter the email of the recipient: ')
             subject=unicode(raw_input('enter the subject of the email: '))
             text=unicode(raw_input('enter your the text of the email: '))
-            self.driver.switch_to_window(self.driver.window_handles[1])
+            self.driver.switch_to_window(self.driver.window_handles[1])# switch to letter list window
             self._click_by_element(element_selector='div.compose-link-box a.compose-message-link')#write_letter_button click
             self._switch_to_simpletext_mode()
             self.driver.implicitly_wait(5)
@@ -88,8 +87,7 @@ class UkrNetService(EmailService):
 
     def letter_list(self):
         num=int(raw_input("enter how many recent emails' subjects you want to see: "))
-        letter_list_window=self.driver.window_handles[1]
-        self.driver.switch_to_window(letter_list_window)
+        self.driver.switch_to_window(self.driver.window_handles[1])# switch to letter list window
         tbody=self.driver.find_element_by_css_selector('table.grid.search-enabled tbody#msglist_rows')
         rows_list=tbody.find_elements_by_css_selector('tr')[:num]# the part of the list of rows
         for index,row in enumerate(rows_list, start=1):
@@ -104,6 +102,20 @@ class UkrNetService(EmailService):
             print '---'*8
         self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
 
+    def read_letter(self):
+        num=int(raw_input("enter what email (what number) do you want to read: "))
+        self.driver.switch_to_window(self.driver.window_handles[1])# switch to letter list window
+        tbody=self.driver.find_element_by_css_selector('table.grid.search-enabled tbody#msglist_rows')
+        row=tbody.find_elements_by_css_selector('tr')[num-1]# row in(email in email list) that you want to read
+        row.click()
+        from_email=self.driver.find_element_by_css_selector('div.center-info a.from').text
+        subject=self.driver.find_element_by_css_selector('div.center-info span.subject').text
+        text=self.driver.find_element_by_css_selector('div#displayBody.body pre').text
+        print'==='*8
+        print 'from: ',from_email
+        print 'subject: ', ' '.join(subject.split(' ')[1:])
+        print 'text: ',text
+        print'==='*8
 
 #uncomment this lines (if you want to see a list of subjects(table)) and run python ukr_net.py
 # ukr_net=UkrNetService()
@@ -111,8 +123,14 @@ class UkrNetService(EmailService):
 # ukr_net.letter_list()#parsing list of subjects(table) and getting subjects and additional info
 # ukr_net.driver.quit()#close all windows
 
-#uncomment this lines (if you want to send email) and run python ukr_net.py
-ukr_net=UkrNetService()
-ukr_net.open_email()
-ukr_net.write_letter()
-ukr_net.driver.quit()#close all windows
+#uncomment this lines (if you want to read email) and run python ukr_net.py
+# ukr_net=UkrNetService()
+# ukr_net.open_email()
+# ukr_net.read_letter()
+# ukr_net.driver.quit()#close all windows
+
+#uncomment this lines (if you want to read email) and run python ukr_net.py
+# ukr_net=UkrNetService()
+# ukr_net.open_email()
+# ukr_net.write_letter()
+# ukr_net.driver.quit()#close all windows
