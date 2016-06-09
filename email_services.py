@@ -6,11 +6,11 @@ from selenium.webdriver.common.alert import Alert
 
 
 class EmailService(object):
-    """docstring for EmailService"""
+    """The parent class for all classes that implement the api to email services"""
     def __init__(self):
         self.email_service='your_email_service'
         self.driver=webdriver.Firefox()
-        self.name='name_of_service. Override this attr in a child class'
+        self.name='Name of the email service. Override this arrt in a child class'
 
     def _click_by_element(self,element_selector=''):
         elem=self.driver.find_element_by_css_selector(element_selector)
@@ -42,14 +42,14 @@ class EmailService(object):
 
 
 class UkrNetService(EmailService):
-    """docstring for UkrNetService"""
-
+    """The class for ukr.net service"""
     def __init__(self):
         super(UkrNetService, self).__init__()
         self.email_service='https://www.ukr.net/'
         self.name='ukr.net'
 
     def open_email(self):
+        ''' this method open https://www.ukr.net/ service, open list of letters'''
         email_service='https://www.ukr.net/'
         log=unicode(raw_input('enter your login: '))
         pas=unicode(raw_input('enter your pass: '))
@@ -119,22 +119,3 @@ class UkrNetService(EmailService):
         print 'subject: ', ' '.join(subject.split(' ')[1:])
         print 'text: ',text
         print'==='*8
-
-#uncomment this lines (if you want to see a list of subjects(table)) and run python ukr_net.py
-# ukr_net=UkrNetService()
-# ukr_net.open_email()# open https://www.ukr.net/ service, open list of letters
-# ukr_net.letter_list()#parsing list of subjects(table) and getting subjects and additional info
-# ukr_net.driver.quit()#close all windows
-
-#uncomment this lines (if you want to read email) and run python ukr_net.py
-# ukr_net=UkrNetService()
-# ukr_net.open_email()
-# ukr_net.read_letter()
-# ukr_net.driver.quit()#close all windows
-
-#uncomment this lines (if you want to write email) and run python ukr_net.py
-# ukr_net=UkrNetService()
-# ukr_net.open_email()
-# ukr_net.write_letter()
-# ukr_net.driver.quit()#close all windows
-
