@@ -1,7 +1,11 @@
-It will be a console email client that based on Selenium.  
-Now you can find fully working parts that:  
-    sends email,  
-    reads email,  
-    reads list of subjects  
-(works with https://www.ukr.net/ service) in `ukr_net.py`.  
-See source code.
+It is a simple console email client that based on Selenium WebDriver and Python.  
+Running:  
+--`email_client.py`  
+It works only with https://www.ukr.net/ service yet.  
+
+Before using:  
+sudo apt-get firefox #if it not install yet  
+sudo apt-get install xvfb  
+pip install selenium  
+pip install pyvirtualdisplay  
+

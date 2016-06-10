@@ -48,12 +48,9 @@ class UkrNetService(EmailService):
         self.email_service='https://www.ukr.net/'
         self.name='ukr.net'
 
-    def open_email(self):
+    def open_email(self,log,pas):
         ''' this method open https://www.ukr.net/ service, open list of letters'''
         email_service='https://www.ukr.net/'
-        log=unicode(raw_input('enter your login: '))
-        pas=unicode(raw_input('enter your pass: '))
-        self.driver.get(email_service)
         self._send_keys_element(element_selector='div.login input',text=log)#enter login
         self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
         self._press_submit(element_selector='div.submit button')
@@ -68,11 +65,14 @@ class UkrNetService(EmailService):
             self.driver.implicitly_wait(5)
             Alert(self.driver).accept()
 
+    def _logout(self):
+        self._click_by_element(element_selector='div.user-name a')
+
     def write_letter(self):
         try:
-            to_email=raw_input('enter the email of the recipient: ')
-            subject=unicode(raw_input('enter the subject of the email: '))
-            text=unicode(raw_input('enter your the text of the email: '))
+            to_email=raw_input('enter the email of the recipient: ').strip()
+            subject=raw_input('enter the subject of the email: ').strip()
+            text=raw_input('enter your the text of the email: ')
             self.driver.switch_to_window(self.driver.window_handles[1])# switch to letter list window
             self._click_by_element(element_selector='div.compose-link-box a.compose-message-link')#write_letter_button click
             self._switch_to_simpletext_mode()
@@ -83,10 +83,15 @@ class UkrNetService(EmailService):
             self._click_by_element(element_selector='span.send-button.button input')# send an email
             print "The letter was sent"
             print '---'*8
+            self.driver.close()#close the window with a form for sending the letter.
             self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+            self._logout()
         except:
             print "Error.The letter was not sent"
             print '---'*8
+            self.driver.close()
+            self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+            self._logout()
 
     def letter_list(self):
         num=int(raw_input("enter how many recent emails' subjects you want to see: "))
@@ -103,7 +108,9 @@ class UkrNetService(EmailService):
             date=unicode(cols_list[4].get_attribute("title"))
             print '%s | %s\t%s\t%s'%(index,from_title,subject,date)
             print '---'*8
+        self.driver.close()#close the window with the letter list.
         self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+        self._logout()
 
     def read_letter(self):
         num=int(raw_input("enter what email (what number) do you want to read: "))
@@ -119,3 +126,6 @@ class UkrNetService(EmailService):
         print 'subject: ', ' '.join(subject.split(' ')[1:])
         print 'text: ',text
         print'==='*8
+        self.driver.close()
+        self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
+        self._logout()
