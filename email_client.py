@@ -1,6 +1,7 @@
 # coding: utf-8
 import sys
 from email_services import UkrNetService
+from pyvirtualdisplay import Display
 
 
 def choice_service():
@@ -34,6 +35,7 @@ def continue_func():
                 return True
             else:
                 print 'Bye!'
+                display.stop()
                 sys.exit(0)
         else:
             print 'you entered an error command'
@@ -45,6 +47,8 @@ def run_command(command):
     service.driver.quit()
 
 
+display = Display(visible=0, size=(800, 600))
+display.start()
 service=choice_service()
 print 'you have chosen',service.name
 while True:
