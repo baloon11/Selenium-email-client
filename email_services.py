@@ -28,6 +28,14 @@ class EmailService(object):
         elem=self.driver.find_element_by_css_selector(element_selector)
         elem.submit()
 
+    def _log_in(self,log,pas):
+        '''Override this method in a child class'''
+        pass
+
+    def _logout(self):
+        '''Override this method in a child class'''
+        pass
+
     def open_email(self):
         '''Override this method in a child class'''
         pass
@@ -48,14 +56,6 @@ class UkrNetService(EmailService):
         self.email_service='https://www.ukr.net/'
         self.name='ukr.net'
 
-    def _switch_to_simpletext_mode(self):
-        simple_text_butt=self.driver.find_element_by_css_selector('div.fmedit-panel a')
-        if simple_text_butt.text==u'Простий текст' or simple_text_butt.text==u'Простой текст':
-            self.driver.implicitly_wait(5)
-            simple_text_butt.click()
-            self.driver.implicitly_wait(5)
-            Alert(self.driver).accept()
-
     def _log_in(self,log,pas):
         self._send_keys_element(element_selector='div.login input',text=log)#enter login
         self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
@@ -70,16 +70,19 @@ class UkrNetService(EmailService):
         self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
         self._logout()# logout from email account
 
+    def _switch_to_simpletext_mode(self):
+        simple_text_butt=self.driver.find_element_by_css_selector('div.fmedit-panel a')
+        if simple_text_butt.text==u'Простий текст' or simple_text_butt.text==u'Простой текст':
+            self.driver.implicitly_wait(5)
+            simple_text_butt.click()
+            self.driver.implicitly_wait(5)
+            Alert(self.driver).accept()
+
     def open_email(self,log,pas):
         ''' this method open https://www.ukr.net/ service, open list of letters'''
         email_service='https://www.ukr.net/'
         self._log_in(log,pas)
-        # self._send_keys_element(element_selector='div.login input',text=log)#enter login
-        # self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
-        # self._press_submit(element_selector='div.submit button')
-        # self.driver.implicitly_wait(10)
         self._click_by_element(element_selector='ul.user-info li a.mails')#open the window with a list of letters
-
 
     def write_letter(self):
         try:
@@ -97,20 +100,14 @@ class UkrNetService(EmailService):
             print "The letter was sent"
             time.sleep(5)
             print '---'*8
-            # self.driver.close()#close the window with a form for sending the letter.
-            # self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
-            # self._logout()
             self._close_new_window_and_logout()
         except:
             print "Error.The letter was not sent"
             print '---'*8
             self._close_new_window_and_logout()
-            # self.driver.close()
-            # self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
-            # self._logout()
 
     def letter_list(self):
-        num=int(raw_input("enter how many recent emails' subjects you want to see: "))
+        num=int(raw_input("enter how many recent emails' subjects you want to see: ").strip())
         self.driver.switch_to_window(self.driver.window_handles[1])# switch to letter list window
         tbody=self.driver.find_element_by_css_selector('table.grid.search-enabled tbody#msglist_rows')
         rows_list=tbody.find_elements_by_css_selector('tr')[:num]# the part of the list of rows
@@ -124,11 +121,7 @@ class UkrNetService(EmailService):
             date=unicode(cols_list[4].get_attribute("title"))
             print '%s | %s\t%s\t%s'%(index,from_title,subject,date)
             print '---'*8
-        # self.driver.close()#close the window with the letter list.
-        # self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
-        # self._logout()
         self._close_new_window_and_logout()
-
 
     def read_letter(self):
         num=int(raw_input("enter what email (what number) do you want to read: "))
@@ -144,20 +137,11 @@ class UkrNetService(EmailService):
         print 'subject: ', ' '.join(subject.split(' ')[1:])
         print 'text: ',text
         print'==='*8
-        # self.driver.close()
-        # self.driver.switch_to_window(self.driver.window_handles[0])#switch to main window
-        # self._logout()
         self._close_new_window_and_logout()
-
 
     def check_log_pas(self,log,pas):
         self._log_in(log,pas)
-        # self._send_keys_element(element_selector='div.login input',text=log)#enter login
-        # self._send_keys_element(element_selector='div.password input',text=pas)#enter pass
-        # self._press_submit(element_selector='div.submit button')
-        # self.driver.implicitly_wait(10)
         try:
-            # if this element exists - log and pas are right
             self.driver.find_element_by_css_selector('ul.user-info li a.mails')
             self._logout()
             return True

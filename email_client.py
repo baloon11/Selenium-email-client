@@ -2,6 +2,7 @@
 import sys
 from email_services import UkrNetService
 from pyvirtualdisplay import Display
+from getpass import getpass
 
 
 def choice_service():
@@ -43,7 +44,7 @@ def continue_func():
             else:
                 print 'Bye!'
                 service.driver.quit()
-                #display.stop()
+                display.stop()
                 sys.exit(0)
         else:
             print 'You entered an error command.'
@@ -54,14 +55,14 @@ def run_command(command,log,pas):
     getattr(service, command)()
 
 
-# display = Display(visible=0, size=(800, 600))
-# display.start()
+display = Display(visible=0, size=(800, 600))
+display.start()
 service=choice_service()
 service.driver.get(service.email_service)
 print 'you have chosen',service.name
 while True:
     log=raw_input('enter your login: ').strip()
-    pas=raw_input('enter your pass: ').strip()
+    pas=getpass(prompt='enter your password: ', stream=None).strip()
     if service.check_log_pas(log,pas):
         while True:
             command=choice_command()
