@@ -11,10 +11,11 @@ def choice_service():
         print 'google email --> enter 2 (not available yet)'
         email_service=int(raw_input())
         enter_num_serv=[1] # 1 is ukr.net, you may add a numder of your new email service.
-        if enter_num_serv.count(email_service)!=0:# checking, if this number(email_service) in the list of email services
+        # checking, if this number(email_service) in the list of email services
+        if enter_num_serv.count(email_service)!=0:
             if email_service==1:
                 service=UkrNetService()
-            #in this place you may add new email services as an instance of your_service_class 
+            #in this place you may add new email services as an instance of your_service_class
             return service
         else:
             print 'You selected an error email service. Try again'
@@ -42,7 +43,7 @@ def continue_func():
             else:
                 print 'Bye!'
                 service.driver.quit()
-                display.stop()
+                #display.stop()
                 sys.exit(0)
         else:
             print 'You entered an error command.'
@@ -53,18 +54,23 @@ def run_command(command,log,pas):
     getattr(service, command)()
 
 
-display = Display(visible=0, size=(800, 600))
-display.start()
+# display = Display(visible=0, size=(800, 600))
+# display.start()
 service=choice_service()
 service.driver.get(service.email_service)
 print 'you have chosen',service.name
-log=raw_input('enter your login: ').strip()
-pas=raw_input('enter your pass: ').strip()
 while True:
-    command=choice_command()
-    if command==False:
-        continue
+    log=raw_input('enter your login: ').strip()
+    pas=raw_input('enter your pass: ').strip()
+    if service.check_log_pas(log,pas):
+        while True:
+            command=choice_command()
+            if command==False:
+                continue
+            else:
+                run_command(command,log,pas)
+                if continue_func():
+                    continue
     else:
-        run_command(command,log,pas)
-        if continue_func():
-            continue
+        print 'You entered an error login or password. Try again'
+        continue
